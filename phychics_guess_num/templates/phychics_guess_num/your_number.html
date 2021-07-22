@@ -1,0 +1,12 @@
+{% extends 'main.html' %}
+
+{% block title %}Введите число {% endblock %}
+{% load bootstrap4 %}
+{% block content %}
+<h>Теперь сообщите нам это число и мы проверим кто из экстрасенсов отгадал</h>
+<form action="{% url 'write_num' %}" method="post">
+    {% csrf_token %}
+    {% bootstrap_form number_form %}
+    {% bootstrap_button 'submit' %}
+</form>
+{% endblock %}

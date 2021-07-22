@@ -1,0 +1,6 @@
+/venv/
+/db.sqlite3
+/__pycache__/
+**/__pycache__/
+/.idea/
+Тестовое задание Web Easy (Экстрасенсы).pdf

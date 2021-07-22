@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %} {% endblock %}</title>
+    {% load static %}
+    {% load bootstrap4 %}
+    <link rel="stylesheet" type="text/css" href={% static "styles/bootstrap.min.css" %}>
+</head>
+<body>
+<div class="container">
+
+<div class="row"></div>
+{% block content %}
+{% endblock %}
+<br>
+{#    <div class="row">#}
+    {% for el in phychics %}
+{#        <div class="col">#}
+        <table class="table">
+        <thead>
+            <tr>
+                <th>Имя</th>
+                <th>Уровень доверия</th>
+                <th>Версия числа</th>
+                <th>История ответов</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ el.name }}</td>
+                <td>{{ el.trust_level }}</td>
+                <td>{{ el.version_of_number }}</td>
+                <td>
+                    {% for ver in el.all_versions reversed %}
+                        <div class="row">{{ ver }}</div>
+                    {% endfor %}
+                </td>
+            </tr>
+        </tbody>
+        </table>
+{#        </div>#}
+    {% endfor %}
+{#    </div>#}
+</div>
+</body>
+</html>
