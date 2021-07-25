@@ -1,5 +1,13 @@
+import ctypes
+
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from django.urls import reverse
 from pynames.generators.russian import PaganNamesGenerator
 import random
+
+from phychics_guess_num.forms import NumberForm
+
 
 class Phychic:
     def __init__(self, version_of_number = None, trust=0, try_count=0, all_versions = []):
@@ -23,3 +31,43 @@ class Phychic:
         self.try_count+=1
 
 
+def session_expired_decorator(func):
+    def wrapper_func(request):
+        if not 'vanga_ids' in request.session:
+            vangas = tuple(Phychic() for __i in range(random.randint(2, 5)))
+            # request.session['vanga_ids'] = list(id(vanga) for vanga in vangas)
+            request.session['vanga_ids'] = vangas
+            return HttpResponseRedirect(reverse('guess_num'))
+        else:
+           return func(request)
+    return wrapper_func
+
+@session_expired_decorator
+def get_vanga_list(request):
+    print(request.session['vanga_ids'])
+    # vangas = tuple(ctypes.cast(vanga, ctypes.py_object).value for vanga in request.session['vanga_ids'])
+    vangas = tuple(vanga for vanga in request.session['vanga_ids'])
+    return render(request, 'phychics_guess_num/index.html', {'phychics': vangas})
+
+@session_expired_decorator
+def make_choice(request):
+    vangas = tuple(vanga for vanga in request.session['vanga_ids'])
+    tuple(vanga.make_choice() for vanga in vangas)
+    return HttpResponseRedirect(reverse('write_num'))
+
+@session_expired_decorator
+def get_your_choice(request):
+    number_form = NumberForm()
+    vangas = tuple(vanga for vanga in request.session['vanga_ids'])
+    return render(request, 'phychics_guess_num/your_number.html',
+                  {'phychics': vangas, 'number_form': number_form})
+
+@session_expired_decorator
+def check_result(request):
+    number_form = NumberForm(request.POST)
+    vangas = tuple(vanga for vanga in request.session['vanga_ids'])
+    if number_form.is_valid():
+        tuple(vanga.check_answer(number_form.cleaned_data.get('number')) for vanga in vangas)
+        return HttpResponseRedirect(reverse('guess_num'))
+    else:
+        return HttpResponseRedirect(reverse('write_num'))
