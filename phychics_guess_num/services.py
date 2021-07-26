@@ -1,5 +1,3 @@
-import ctypes
-
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -35,7 +33,6 @@ def session_expired_decorator(func):
     def wrapper_func(request):
         if not 'vanga_ids' in request.session:
             vangas = tuple(Phychic() for __i in range(random.randint(2, 5)))
-            # request.session['vanga_ids'] = list(id(vanga) for vanga in vangas)
             request.session['vanga_ids'] = vangas
             return HttpResponseRedirect(reverse('guess_num'))
         else:
@@ -45,7 +42,6 @@ def session_expired_decorator(func):
 @session_expired_decorator
 def get_vanga_list(request):
     print(request.session['vanga_ids'])
-    # vangas = tuple(ctypes.cast(vanga, ctypes.py_object).value for vanga in request.session['vanga_ids'])
     vangas = tuple(vanga for vanga in request.session['vanga_ids'])
     return render(request, 'phychics_guess_num/index.html', {'phychics': vangas})
 
