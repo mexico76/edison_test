@@ -17,7 +17,7 @@ class Phychic:
 
     def make_choice(self):
         '''Делаем попытку отгадать число загаданное пользоаптелем'''
-        self.version_of_number = random.randint(0, 100) # пока до 100
+        self.version_of_number = random.randint(10, 99)
         self.all_versions.append(self.version_of_number)
 
     def check_answer(self, user_answer):
@@ -34,6 +34,7 @@ def session_expired_decorator(func):
         if not 'vanga_ids' in request.session:
             vangas = tuple(Phychic() for __i in range(random.randint(2, 5)))
             request.session['vanga_ids'] = vangas
+            request.session['user_history'] = []
             return HttpResponseRedirect(reverse('guess_num'))
         else:
            return func(request)
@@ -41,9 +42,9 @@ def session_expired_decorator(func):
 
 @session_expired_decorator
 def get_vanga_list(request):
-    print(request.session['vanga_ids'])
+    user_history = request.session['user_history']
     vangas = tuple(vanga for vanga in request.session['vanga_ids'])
-    return render(request, 'phychics_guess_num/index.html', {'phychics': vangas})
+    return render(request, 'phychics_guess_num/index.html', {'phychics': vangas, 'user_history': user_history})
 
 @session_expired_decorator
 def make_choice(request):
@@ -54,9 +55,10 @@ def make_choice(request):
 @session_expired_decorator
 def get_your_choice(request):
     number_form = NumberForm()
+    user_history = request.session['user_history']
     vangas = tuple(vanga for vanga in request.session['vanga_ids'])
     return render(request, 'phychics_guess_num/your_number.html',
-                  {'phychics': vangas, 'number_form': number_form})
+                  {'phychics': vangas, 'number_form': number_form, 'user_history': user_history})
 
 @session_expired_decorator
 def check_result(request):
@@ -64,6 +66,7 @@ def check_result(request):
     vangas = tuple(vanga for vanga in request.session['vanga_ids'])
     if number_form.is_valid():
         tuple(vanga.check_answer(number_form.cleaned_data.get('number')) for vanga in vangas)
+        request.session['user_history'].append(number_form.cleaned_data.get('number'))
         return HttpResponseRedirect(reverse('guess_num'))
     else:
         return HttpResponseRedirect(reverse('write_num'))

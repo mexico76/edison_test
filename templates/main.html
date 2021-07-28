@@ -14,10 +14,14 @@
 {% block content %}
 {% endblock %}
 <br>
-{#    <div class="row">#}
+<h>Ваша история:</h>
+    <br>
+    {% for answer in user_history reversed %}
+        <h>{{ answer }}</h><br>
+    {% endfor %}
+
+<table class="table">
     {% for el in phychics %}
-{#        <div class="col">#}
-        <table class="table">
         <thead>
             <tr>
                 <th>Имя</th>
@@ -38,10 +42,9 @@
                 </td>
             </tr>
         </tbody>
-        </table>
-{#        </div>#}
     {% endfor %}
-{#    </div>#}
+</table>
+
 </div>
 </body>
 </html>

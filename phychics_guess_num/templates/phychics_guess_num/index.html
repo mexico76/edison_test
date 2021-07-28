@@ -3,7 +3,7 @@
 {% block title %}Загадайте число {% endblock %}
 {% load bootstrap4 %}
 {% block content %}
-<h>Загадайте любое число к примеру от 0 до 100, а несколько наших экстрасенсов попробуют его отгадать</h>
+<h>Загадайте любое число от 10 до 99, а несколько наших экстрасенсов попробуют его отгадать</h>
 <form action="{% url 'guess_num' %}" method="post">
     {% csrf_token %}
     {% bootstrap_button 'Start' %}
